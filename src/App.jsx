@@ -9,8 +9,7 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN || '';
-  const IS_OWNER = !!AUTH_TOKEN;
+  const IS_OWNER = import.meta.env.MODE !== 'production';
 
   useEffect(() => {
     fetchArtworks();
@@ -18,12 +17,7 @@ function App() {
 
   const fetchArtworks = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/artworks`, {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const res = await fetch(`${API_BASE}/api/artworks`);
       const data = await res.json();
       setArtworks(data);
     } catch (err) {
@@ -45,11 +39,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
-        body: formData,
-        credentials: 'include',
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`
-        }
+        body: formData
       });
 
       const data = await res.json();
@@ -72,11 +62,7 @@ function App() {
 
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`
-        }
+        method: 'DELETE'
       });
 
       const data = await res.json();
@@ -100,7 +86,6 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
-      {/* ✅ Only show upload form if you're the artist */}
       {IS_OWNER && (
         <form
           onSubmit={handleSubmit}
@@ -146,7 +131,6 @@ function App() {
         </form>
       )}
 
-      {/* 🖼️ Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
