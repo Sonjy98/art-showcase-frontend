@@ -8,14 +8,15 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [artworks, setArtworks] = useState([]);
 
-  // Load artworks on page load
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
   useEffect(() => {
     fetchArtworks();
   }, []);
 
   const fetchArtworks = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/artworks');
+      const res = await fetch(`${API_BASE}/api/artworks`);
       const data = await res.json();
       setArtworks(data);
     } catch (err) {
@@ -35,13 +36,12 @@ function App() {
     setUploading(true);
 
     try {
-      const res = await fetch('http://localhost:3001/api/upload', {
+      const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
       });
 
       const data = await res.json();
-      console.log(data);
       alert('Artwork uploaded!');
       setTitle('');
       setDescription('');
@@ -60,7 +60,7 @@ function App() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/artworks/${id}`, {
+      const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -84,7 +84,6 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
-      {/* ✅ Upload Form */}
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-xl bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg mb-12"
@@ -128,7 +127,6 @@ function App() {
         </button>
       </form>
 
-      {/* 🖼️ Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
@@ -136,7 +134,7 @@ function App() {
             className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
           >
             <img
-              src={`http://localhost:3001/uploads/${art.filename}`}
+              src={`${API_BASE}/uploads/${art.filename}`}
               alt={art.title}
               className="w-full h-64 object-cover"
             />
