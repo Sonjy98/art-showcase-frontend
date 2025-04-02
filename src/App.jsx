@@ -8,7 +8,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [artworks, setArtworks] = useState([]);
 
-  const API_BASE = import.meta.env.VITE_API_BASE;
+  const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
 
   useEffect(() => {
     fetchArtworks();
