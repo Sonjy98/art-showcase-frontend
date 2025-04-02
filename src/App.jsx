@@ -132,7 +132,7 @@ function App() {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {artworks.map((art) => (
+        {Array.isArray(artworks) && artworks.map((art) => (
           <div
             key={art.id}
             className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
