@@ -16,7 +16,12 @@ function App() {
 
   const fetchArtworks = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/artworks`);
+      const res = await fetch(`${API_BASE}/api/artworks`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await res.json();
       setArtworks(data);
     } catch (err) {
@@ -39,6 +44,7 @@ function App() {
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -62,7 +68,9 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
+        credentials: 'include'
       });
+
       const data = await res.json();
       if (data.success) {
         setArtworks((prev) => prev.filter((art) => art.id !== id));
