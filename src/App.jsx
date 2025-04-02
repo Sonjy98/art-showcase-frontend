@@ -18,10 +18,12 @@ function App() {
   const fetchArtworks = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/artworks`);
+      if (!res.ok) throw new Error('Failed to fetch artworks');
       const data = await res.json();
-      setArtworks(data);
+      setArtworks(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching artworks:', err);
+      setArtworks([]); // fallback to empty
     }
   };
 
@@ -42,7 +44,8 @@ function App() {
         body: formData
       });
 
-      const data = await res.json();
+      if (!res.ok) throw new Error('Upload failed');
+      await res.json();
       alert('Artwork uploaded!');
       setTitle('');
       setDescription('');
@@ -86,6 +89,7 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
+      {/* Upload Form (only in dev/local mode) */}
       {IS_OWNER && (
         <form
           onSubmit={handleSubmit}
@@ -118,6 +122,7 @@ function App() {
               accept="image/*"
               onChange={(e) => setImage(e.target.files[0])}
               className="w-full text-white bg-gray-800 border border-white/10 rounded-lg px-4 py-2 cursor-pointer"
+              required
             />
           </div>
 
@@ -131,8 +136,9 @@ function App() {
         </form>
       )}
 
+      {/* Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {Array.isArray(artworks) && artworks.map((art) => (
+        {artworks.map((art) => (
           <div
             key={art.id}
             className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
