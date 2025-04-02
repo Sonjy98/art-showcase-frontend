@@ -9,6 +9,8 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
+  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN || '';
+  const IS_OWNER = !!AUTH_TOKEN;
 
   useEffect(() => {
     fetchArtworks();
@@ -44,7 +46,10 @@ function App() {
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${AUTH_TOKEN}`
+        }
       });
 
       const data = await res.json();
@@ -68,7 +73,10 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${AUTH_TOKEN}`
+        }
       });
 
       const data = await res.json();
@@ -92,49 +100,53 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-xl bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg mb-12"
-      >
-        <div className="mb-4">
-          <label className="block mb-1">Title</label>
-          <input
-            type="text"
-            className="w-full px-4 py-2 text-black rounded-lg outline-none focus:ring-2 ring-pink-400"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Description</label>
-          <textarea
-            className="w-full px-4 py-2 text-black rounded-lg outline-none focus:ring-2 ring-pink-400"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-full text-white bg-gray-800 border border-white/10 rounded-lg px-4 py-2 cursor-pointer"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded font-semibold"
-          disabled={uploading}
+      {/* ✅ Only show upload form if you're the artist */}
+      {IS_OWNER && (
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-xl bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg mb-12"
         >
-          {uploading ? 'Uploading...' : 'Upload'}
-        </button>
-      </form>
+          <div className="mb-4">
+            <label className="block mb-1">Title</label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 text-black rounded-lg outline-none focus:ring-2 ring-pink-400"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
 
+          <div className="mb-4">
+            <label className="block mb-1">Description</label>
+            <textarea
+              className="w-full px-4 py-2 text-black rounded-lg outline-none focus:ring-2 ring-pink-400"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-1">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="w-full text-white bg-gray-800 border border-white/10 rounded-lg px-4 py-2 cursor-pointer"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded font-semibold"
+            disabled={uploading}
+          >
+            {uploading ? 'Uploading...' : 'Upload'}
+          </button>
+        </form>
+      )}
+
+      {/* 🖼️ Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
@@ -151,13 +163,15 @@ function App() {
                 <h2 className="text-xl font-bold">{art.title}</h2>
                 <p className="text-gray-400 text-sm">{art.description}</p>
               </div>
-              <button
-                onClick={() => handleDelete(art.id)}
-                className="text-red-400 hover:text-red-600 text-lg ml-4"
-                title="Delete"
-              >
-                🗑️
-              </button>
+              {IS_OWNER && (
+                <button
+                  onClick={() => handleDelete(art.id)}
+                  className="text-red-400 hover:text-red-600 text-lg ml-4"
+                  title="Delete"
+                >
+                  🗑️
+                </button>
+              )}
             </div>
           </div>
         ))}
