@@ -9,8 +9,11 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
-  const IS_OWNER = !!AUTH_TOKEN; // Only show upload/delete if token exists
+  const AUTH_HEADER =
+    import.meta.env.MODE !== 'production'
+      ? { Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN_DEV}` }
+      : {};
+  const IS_OWNER = !!AUTH_HEADER.Authorization;
 
   useEffect(() => {
     fetchArtworks();
@@ -44,7 +47,7 @@ function App() {
         method: 'POST',
         body: formData,
         headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`
+          ...AUTH_HEADER
         }
       });
 
@@ -71,7 +74,7 @@ function App() {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`
+          ...AUTH_HEADER
         }
       });
 
