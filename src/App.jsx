@@ -9,7 +9,8 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  const IS_OWNER = import.meta.env.MODE !== 'production';
+  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
+  const IS_OWNER = !!AUTH_TOKEN; // Only show upload/delete if token exists
 
   useEffect(() => {
     fetchArtworks();
@@ -23,7 +24,7 @@ function App() {
       setArtworks(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching artworks:', err);
-      setArtworks([]); // fallback to empty
+      setArtworks([]);
     }
   };
 
@@ -41,7 +42,10 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${AUTH_TOKEN}`
+        }
       });
 
       if (!res.ok) throw new Error('Upload failed');
@@ -65,7 +69,10 @@ function App() {
 
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${AUTH_TOKEN}`
+        }
       });
 
       const data = await res.json();
@@ -89,7 +96,6 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
-      {/* Upload Form (only in dev/local mode) */}
       {IS_OWNER && (
         <form
           onSubmit={handleSubmit}
@@ -136,7 +142,6 @@ function App() {
         </form>
       )}
 
-      {/* Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
