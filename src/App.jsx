@@ -9,28 +9,15 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '');
-  const IS_OWNER = import.meta.env.VITE_IS_OWNER?.trim?.().toLowerCase() === 'true';
-
-  const AUTH_TOKEN = IS_OWNER
-    ? import.meta.env.MODE === 'production'
-      ? import.meta.env.VITE_AUTH_TOKEN
-      : import.meta.env.VITE_AUTH_TOKEN_DEV
-    : null;
-
+  const IS_OWNER = !!localStorage.getItem('auth_token');
+  const AUTH_TOKEN = localStorage.getItem('auth_token');
   const AUTH_HEADER = AUTH_TOKEN
     ? { Authorization: `Bearer ${AUTH_TOKEN}` }
     : {};
 
-  // DEBUG: Log all relevant env info
-  console.log("🧠 Environment Info:");
-  console.log("MODE:", import.meta.env.MODE);
-  console.log("VITE_API_BASE:", API_BASE);
-  console.log("VITE_IS_OWNER:", import.meta.env.VITE_IS_OWNER);
-  console.log("IS_OWNER (parsed):", IS_OWNER);
-  console.log("AUTH_TOKEN (hidden):", AUTH_TOKEN ? "[yes]" : "[no]");
-  console.log("AUTH_HEADER:", AUTH_HEADER);
-
   useEffect(() => {
+    console.log('🔐 IS_OWNER:', IS_OWNER);
+    console.log('📡 API_BASE:', API_BASE);
     fetchArtworks();
   }, []);
 
