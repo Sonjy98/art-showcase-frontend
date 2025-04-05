@@ -154,7 +154,7 @@ function App() {
             className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
           >
             <img
-              src={art.filename}
+              src={art.url}
               alt={art.title}
               className="w-full h-64 object-cover"
             />
