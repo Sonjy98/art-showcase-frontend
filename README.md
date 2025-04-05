@@ -1,12 +1,23 @@
-# React + Vite
+Art Showcase – Frontend
+This is the frontend for the Art Showcase web app, built with React and Tailwind CSS. It displays pixel artworks, supports responsive design, and includes an authenticated upload form for the site owner.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🌐 Live Demo
+Visit the site [here](https://courageous-pastelito-4fbee7.netlify.app/)
 
-Currently, two official plugins are available:
+📦 Features
+View pixel artworks in a responsive gallery.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Upload and delete artworks as the site owner.
 
-## Expanding the ESLint configuration
+Environment-based access control (upload/delete only available to owner).
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Smooth layout using Tailwind and CSS transitions.
+
+🛠️ Tech Stack
+React + Vite
+
+Tailwind CSS
+
+Netlify deployment
+
+Environment variables (.env for local, Netlify Dashboard for prod)
