@@ -9,14 +9,11 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-
-  // Token only available in development for security
-  const IS_DEV = import.meta.env.MODE !== 'production';
-  const AUTH_TOKEN = IS_DEV ? import.meta.env.VITE_AUTH_TOKEN_DEV : null;
-  const AUTH_HEADER = AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {};
-
-  // Only you will see controls locally
-  const IS_OWNER = IS_DEV && !!AUTH_TOKEN;
+  const IS_OWNER = import.meta.env.VITE_IS_OWNER === 'true';
+  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN_DEV;
+  const AUTH_HEADER = IS_OWNER && AUTH_TOKEN
+    ? { Authorization: `Bearer ${AUTH_TOKEN}` }
+    : {};
 
   useEffect(() => {
     fetchArtworks();
@@ -49,9 +46,7 @@ function App() {
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
-        headers: {
-          ...AUTH_HEADER
-        }
+        headers: AUTH_HEADER
       });
 
       if (!res.ok) throw new Error('Upload failed');
@@ -76,9 +71,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
-        headers: {
-          ...AUTH_HEADER
-        }
+        headers: AUTH_HEADER
       });
 
       const data = await res.json();
@@ -102,7 +95,6 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
-      {/* Upload Form */}
       {IS_OWNER && (
         <form
           onSubmit={handleSubmit}
@@ -149,7 +141,6 @@ function App() {
         </form>
       )}
 
-      {/* Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
