@@ -9,11 +9,14 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  const AUTH_HEADER =
-    import.meta.env.MODE !== 'production'
-      ? { Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN_DEV}` }
-      : {};
-  const IS_OWNER = !!AUTH_HEADER.Authorization;
+
+  // Token only available in development for security
+  const IS_DEV = import.meta.env.MODE !== 'production';
+  const AUTH_TOKEN = IS_DEV ? import.meta.env.VITE_AUTH_TOKEN_DEV : null;
+  const AUTH_HEADER = AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {};
+
+  // Only you will see controls locally
+  const IS_OWNER = IS_DEV && !!AUTH_TOKEN;
 
   useEffect(() => {
     fetchArtworks();
@@ -99,6 +102,7 @@ function App() {
         Here you'll see my pixel art 😸
       </p>
 
+      {/* Upload Form */}
       {IS_OWNER && (
         <form
           onSubmit={handleSubmit}
@@ -145,6 +149,7 @@ function App() {
         </form>
       )}
 
+      {/* Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {artworks.map((art) => (
           <div
