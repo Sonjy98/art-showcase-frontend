@@ -8,7 +8,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [artworks, setArtworks] = useState([]);
 
-  const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
+  const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '');
   const IS_OWNER = import.meta.env.VITE_IS_OWNER?.trim?.().toLowerCase() === 'true';
 
   const AUTH_TOKEN = IS_OWNER
@@ -21,6 +21,15 @@ function App() {
     ? { Authorization: `Bearer ${AUTH_TOKEN}` }
     : {};
 
+  // DEBUG: Log all relevant env info
+  console.log("🧠 Environment Info:");
+  console.log("MODE:", import.meta.env.MODE);
+  console.log("VITE_API_BASE:", API_BASE);
+  console.log("VITE_IS_OWNER:", import.meta.env.VITE_IS_OWNER);
+  console.log("IS_OWNER (parsed):", IS_OWNER);
+  console.log("AUTH_TOKEN (hidden):", AUTH_TOKEN ? "[yes]" : "[no]");
+  console.log("AUTH_HEADER:", AUTH_HEADER);
+
   useEffect(() => {
     fetchArtworks();
   }, []);
@@ -32,7 +41,7 @@ function App() {
       const data = await res.json();
       setArtworks(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Error fetching artworks:', err);
+      console.error('❌ Error fetching artworks:', err);
       setArtworks([]);
     }
   };
@@ -49,16 +58,21 @@ function App() {
     setUploading(true);
 
     try {
+      console.log('📡 Uploading to:', `${API_BASE}/api/upload`);
       console.log('🔐 Sending Headers:', AUTH_HEADER);
-    
+
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
-        headers: AUTH_HEADER
+        headers: AUTH_HEADER,
       });
-    
-      if (!res.ok) throw new Error('Upload failed');
-    
+
+      if (!res.ok) {
+        const errorBody = await res.text();
+        console.error(`❌ Upload failed: ${res.status}`, errorBody);
+        throw new Error('Upload failed');
+      }
+
       await res.json();
       alert('Artwork uploaded!');
       setTitle('');
@@ -66,7 +80,7 @@ function App() {
       setImage(null);
       fetchArtworks();
     } catch (err) {
-      console.error(err);
+      console.error('❌ Upload error:', err);
       alert('Upload failed.');
     }
 
@@ -80,7 +94,7 @@ function App() {
     try {
       const res = await fetch(`${API_BASE}/api/artworks/${id}`, {
         method: 'DELETE',
-        headers: AUTH_HEADER
+        headers: AUTH_HEADER,
       });
 
       const data = await res.json();
@@ -90,7 +104,7 @@ function App() {
         alert('Failed to delete artwork.');
       }
     } catch (err) {
-      console.error(err);
+      console.error('❌ Delete error:', err);
       alert('Delete failed.');
     }
   };
@@ -103,6 +117,13 @@ function App() {
       <p className="text-gray-400 text-center mb-8 max-w-xl">
         Here you'll see my pixel art 😸
       </p>
+
+      {!IS_OWNER && (
+        <div className="text-red-400 bg-red-900/30 border border-red-500 px-4 py-2 rounded-xl mb-10">
+          <strong>Note:</strong> You are not recognized as the site owner.<br />
+          Uploading and deleting is disabled.
+        </div>
+      )}
 
       {IS_OWNER && (
         <form
@@ -145,7 +166,7 @@ function App() {
             className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded font-semibold"
             disabled={uploading}
           >
-            {uploading ? 'Uploading...' : 'Upload'}
+            {uploading ? 'Uploading…' : 'Upload'}
           </button>
         </form>
       )}
