@@ -49,13 +49,16 @@ function App() {
     setUploading(true);
 
     try {
+      console.log('🔐 Sending Headers:', AUTH_HEADER);
+    
       const res = await fetch(`${API_BASE}/api/upload`, {
         method: 'POST',
         body: formData,
         headers: AUTH_HEADER
       });
-
+    
       if (!res.ok) throw new Error('Upload failed');
+    
       await res.json();
       alert('Artwork uploaded!');
       setTitle('');
