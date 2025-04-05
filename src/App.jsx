@@ -10,8 +10,14 @@ function App() {
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
   const IS_OWNER = import.meta.env.VITE_IS_OWNER === 'true';
-  const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN_DEV;
-  const AUTH_HEADER = IS_OWNER && AUTH_TOKEN
+
+  const AUTH_TOKEN = IS_OWNER
+    ? import.meta.env.MODE === 'production'
+      ? import.meta.env.VITE_AUTH_TOKEN
+      : import.meta.env.VITE_AUTH_TOKEN_DEV
+    : null;
+
+  const AUTH_HEADER = AUTH_TOKEN
     ? { Authorization: `Bearer ${AUTH_TOKEN}` }
     : {};
 
@@ -148,7 +154,7 @@ function App() {
             className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
           >
             <img
-              src={`${API_BASE}/uploads/${art.filename}`}
+              src={art.filename}
               alt={art.title}
               className="w-full h-64 object-cover"
             />
