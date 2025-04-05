@@ -167,7 +167,7 @@ function App() {
             <img
               src={art.url}
               alt={art.title}
-              className="w-full h-64 object-cover"
+              className="w-full h-64 object-contain bg-black p-2 rounded"
             />
             <div className="p-4 flex justify-between items-start">
               <div>
