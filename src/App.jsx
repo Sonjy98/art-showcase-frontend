@@ -9,7 +9,7 @@ function App() {
   const [artworks, setArtworks] = useState([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE.replace(/\/$/, '');
-  const IS_OWNER = import.meta.env.VITE_IS_OWNER === 'true';
+  const IS_OWNER = import.meta.env.VITE_IS_OWNER?.trim?.().toLowerCase() === 'true';
 
   const AUTH_TOKEN = IS_OWNER
     ? import.meta.env.MODE === 'production'
