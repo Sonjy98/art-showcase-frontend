@@ -7,6 +7,7 @@ function App() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true); // 🆕 added loading state
 
   const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '');
   const IS_OWNER = !!localStorage.getItem('auth_token');
@@ -22,6 +23,7 @@ function App() {
   }, []);
 
   const fetchArtworks = async () => {
+    setLoading(true); // 🆕 show loading
     try {
       const res = await fetch(`${API_BASE}/api/artworks`);
       if (!res.ok) throw new Error('Failed to fetch artworks');
@@ -31,6 +33,7 @@ function App() {
       console.error('❌ Error fetching artworks:', err);
       setArtworks([]);
     }
+    setLoading(false); // 🆕 hide loading
   };
 
   const handleSubmit = async (e) => {
@@ -158,35 +161,41 @@ function App() {
         </form>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {artworks.map((art) => (
-          <div
-            key={art.id}
-            className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
-          >
-            <img
-              src={art.url}
-              alt={art.title}
-              className="w-full h-64 object-contain bg-black p-2 rounded"
-            />
-            <div className="p-4 flex justify-between items-start">
-              <div>
-                <h2 className="text-xl font-bold">{art.title}</h2>
-                <p className="text-gray-400 text-sm">{art.description}</p>
+      {loading ? (
+        <div className="text-gray-400 text-center mt-20 text-lg animate-pulse">
+          🔄 Waking up the server... Please wait a moment ☕
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {artworks.map((art) => (
+            <div
+              key={art.id}
+              className="bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 duration-200"
+            >
+              <img
+                src={art.url}
+                alt={art.title}
+                className="w-full h-64 object-contain bg-black p-2 rounded"
+              />
+              <div className="p-4 flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-bold">{art.title}</h2>
+                  <p className="text-gray-400 text-sm">{art.description}</p>
+                </div>
+                {IS_OWNER && (
+                  <button
+                    onClick={() => handleDelete(art.id)}
+                    className="text-red-400 hover:text-red-600 text-lg ml-4"
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                )}
               </div>
-              {IS_OWNER && (
-                <button
-                  onClick={() => handleDelete(art.id)}
-                  className="text-red-400 hover:text-red-600 text-lg ml-4"
-                  title="Delete"
-                >
-                  🗑️
-                </button>
-              )}
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
